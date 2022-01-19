@@ -1,0 +1,64 @@
+package servlets;
+
+import pojo.User; //à changer selon le nom du package et de la classe que cheikh aura mis
+import dao.Authentification; //idem
+import service.Loader; // à implémenter dans le package service
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/signin")
+public class ControleAuth extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public AuthServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.getRequestDispatcher("authentification.jsp").forward(request, response); //selon le nom de jsp que Amina aura mis
+		//l'url signin permet d'accéder à la page d'authentification
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	
+	//on soumet la l'authenfication avec la méthode post
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//recupération des paramètres de connexion
+		String login = request.getParameter("loginUser");
+    	String password = request.getParameter("passwordUser");
+	    DaoAuthentification auth = new DaoAuthentification();//à adapter au nom de la classe
+	    auth.setLogin(login);
+	    auth.setPassword(password);
+	    boolean isConnected = auth.authentification();//la methode devra set les autres attributs from la bd
+	    System.out.println(isConnected);
+	    if(isConnected){
+	    	HttpSession session = request.getSession();
+	    	session.setAttribute("loginUser", login);
+	    	session.setAttribute("passwordUser", password);
+	    	session.setAttribute("nomUser", user.getNom());
+	    	session.setAttribute("profil", user.getProfil());//profil={simple,admin,root}
+	    	load(); //pour charger les images de la bd vers le server d'appli
+		    response.sendRedirect("index"); //on le redirige vers sa page d'accueil  		
+	    	}
+	    	else {
+	    		System.out.println("Login et/ou mot de passe incorrect(s)");
+	    		response.sendRedirect("signin");
+	    	} 	
+	}
+
+}
+
